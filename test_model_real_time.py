@@ -1,14 +1,18 @@
 import os
-from typing import Tuple
+import time
 import argparse
+from typing import Tuple
+from tqdm import tqdm
 
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
+import tensorflow as tf
 import albumentations as A
 
 from model import build_model
+from data_generator import DataGenerator
 from config import INPUT_SHAPE
+from metrics import Accuracy, IoURectangle
 
 
 def preparing_frame(image: np.ndarray, model) -> Tuple[np.ndarray, tuple, int]:
@@ -19,7 +23,6 @@ def preparing_frame(image: np.ndarray, model) -> Tuple[np.ndarray, tuple, int]:
     :param model: model with loaded weights.
     :return:
     """
-
     image = cv2.resize(image, (INPUT_SHAPE[1], INPUT_SHAPE[0]))
     predict = model.predict(np.expand_dims(image, axis=0) / 255.0)[0]
     if predict[0] <= 0.5:
@@ -78,54 +81,39 @@ def visualization() -> None:
     cv2.destroyAllWindows()
 
 
-def image_vis():
-    # When everything done, release the capture
-    cat_dog = {0: 'cat', 1: 'dog'}
-    BOX_COLOR = (255, 0, 0)  # Red
-    TEXT_COLOR = (255, 255, 255)  # White
+def test_metrics_and_time(mode: str) -> None:
+    """
+    This function calculates the average value of loss and metrics as well as inference time and average fps.
 
+    :param mode: depending on the mode ('metrics', 'time'), the function counts (loss, metrics) or time and average fps.
+    """
+    data_gen = DataGenerator(batch_size=1, is_train=False)
     model = build_model()
     model.load_weights('models_data/save_models/resnet18_imagenet_2021-05-23 18:51:27/resnet18.h5')
-    path = '/home/andre/Downloads/1560872802_0_778_1536_1642_600x0_80_0_0_606c2d47b6d37951adc9eaf750de22f0.jpg'
-    img = cv2.imread(path)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = cv2.resize(img, (INPUT_SHAPE[1], INPUT_SHAPE[0]))
-    predict = model.predict(np.expand_dims(img, axis=0) / 255.0)[0]
-    if predict[0] <= 0.5:
-        label = 0
-    else:
-        label = 1
-    aug = A.Compose([A.Resize(height=720, width=720)],
-                    bbox_params=A.BboxParams(format='pascal_voc', label_fields=['category_ids']))
-    transform = aug(image=img, bboxes=[predict[1:] * INPUT_SHAPE[0]], category_ids=[str(predict[0])])
-    img = transform['image']
-    bounding_box = transform['bboxes'][0]
-    x_min, y_min, x_max, y_max = (int(bounding_box[0]),
-                                  int(bounding_box[1]),
-                                  int(bounding_box[2]),
-                                  int(bounding_box[3]))
-    cv2.rectangle(img, (x_min, y_min), (x_max, y_max), color=BOX_COLOR, thickness=2)
-    ((text_width, text_height), _) = cv2.getTextSize(cat_dog[label],
-                                                     cv2.FONT_HERSHEY_SIMPLEX, 0.35, 1)
-    cv2.rectangle(img, (x_min, y_min - int(1.3 * text_height)), (x_min + text_width, y_min), BOX_COLOR, -1)
-    cv2.putText(
-        img,
-        text=cat_dog[label],
-        org=(x_min, y_min - int(0.3 * text_height)),
-        fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-        fontScale=0.35,
-        color=TEXT_COLOR,
-        lineType=cv2.LINE_AA,
-    )
-    cv2.imshow('frame', img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    model.compile(loss=tf.keras.losses.binary_crossentropy, metrics=[Accuracy(), IoURectangle()])
+
+    if mode == 'metrics':
+        print(model.evaluate(data_gen, workers=8))
+
+    elif mode == 'time':
+        all_times = []
+        for i in tqdm(range(len(data_gen))):
+            images, _ = data_gen[i]
+            start_time = time.time()
+            model.predict(images)
+            finish_time = time.time()
+            all_times.append(finish_time - start_time)
+        all_times = all_times[5:]
+        message = '\nMean inference time: {:.04f}. Mean FPS: {:.04f}.\n'.format(
+            np.mean(all_times),
+            len(all_times) / sum(all_times)
+        )
+        print(message)
 
 
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = ''
     # devices = tf.config.experimental.list_physical_devices('GPU')
     # tf.config.experimental.set_memory_growth(devices[0], True)
-    visualization()
-    #image_vis()
-
+    # visualization()
+    test_metrics_and_time('time')
