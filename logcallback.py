@@ -1,5 +1,6 @@
 import os
 import json
+from typing import Dict
 
 from tensorflow import keras
 
@@ -33,8 +34,15 @@ class LogCallback(keras.callbacks.Callback):
     def save_logs(self) -> None:
         with open(self.log_file, 'w') as file:
             json.dump(self.logs, file, indent=4)
-    # исправить
-    def on_epoch_end(self, epoch, logs=None):
+
+    def on_epoch_end(self, epoch: int, logs: Dict[str, float] = None) -> None:
+        """
+        This method prepares the data for writing to a json file and calls the method to save the json file.
+        If  = self.save_model_every_epoch = True, then the model is saved every epoch.
+
+        :param epoch: current epoch number.
+        :param logs: dictionary with metrics that are specified in the model, such as accuracy, precision or recall.
+        """
         text = ['epoch: {:03d}'.format(epoch + 1)]
         for key, value in logs.items():
             if key not in self.logs:
