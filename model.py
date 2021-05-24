@@ -40,7 +40,6 @@ def build_model(input_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: in
     except ValueError:
         print('the model name is incorrect, please check the model name')
 
-    # для тестового задания
     x = tf.keras.layers.GlobalAveragePooling2D()(base_model.output)
     output = tf.keras.layers.Dense(5, activation='sigmoid')(x)
     model = tf.keras.models.Model(inputs=[base_model.input], outputs=[output])
