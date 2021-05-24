@@ -8,7 +8,7 @@ import numpy as np
 import albumentations as A
 import matplotlib.pyplot as plt
 
-from config import JSON_FILE_PATH, NUMBER_OF_CLASSES, BATCH_SIZE, INPUT_SHAPE, USE_AUGMENTATION, TRAIN_DATA, VAL_DATA
+from config import NUMBER_OF_CLASSES, BATCH_SIZE, INPUT_SHAPE, USE_AUGMENTATION, TRAIN_DATA, VAL_DATA
 
 
 class DataGenerator(keras.utils.Sequence):
@@ -163,7 +163,7 @@ def images_augmentation(use_augmentation: bool = USE_AUGMENTATION) -> A.Compose:
               A.Flip(p=0.4),
               A.Rotate(limit=320, interpolation=1, border_mode=4, value=None, mask_value=None, always_apply=False,
                        p=0.2)
-              ])
+              ], bbox_params=A.BboxParams(format='pascal_voc', label_fields=['category_ids']))
     else:
         aug = A.Compose([A.Resize(height=INPUT_SHAPE[0], width=INPUT_SHAPE[1])],
                         bbox_params=A.BboxParams(format='pascal_voc', label_fields=['category_ids']))
