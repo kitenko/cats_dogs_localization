@@ -1,0 +1,5 @@
+data
+.idea
+__pycache__
+models_data
+cats_dogs_dataset
