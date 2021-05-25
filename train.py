@@ -28,11 +28,11 @@ def train() -> None:
                   metrics=[Accuracy(), IoURectangle()])
     model.summary()
 
-    early = EarlyStopping(monitor='loss', min_delta=0, patience=15, verbose=1, mode='auto')
+    early = EarlyStopping(monitor='loss', min_delta=0, patience=7, verbose=1, mode='auto')
     checkpoint_filepath = os.path.join(SAVE_CURRENT_MODEL, MODEL_NAME + '.h5')
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_filepath,
-        monitor='IoU',
+        monitor='iou_rectangle',
         mode='max',
         save_best_only=True
     )
