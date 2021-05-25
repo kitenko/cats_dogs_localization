@@ -15,6 +15,24 @@ from config import INPUT_SHAPE
 from metrics import Accuracy, IoURectangle
 
 
+def parse_args() -> argparse.Namespace:
+    """
+    Parsing command line arguments with argparse.
+    """
+    parser = argparse.ArgumentParser('script for model testing.')
+    parser.add_argument('--weights', type=str, default=None, help='Path for loading model weights.')
+    parser.add_argument('--webcam', default=False, action='store_true', help='If the value is True, then the webcam '
+                                                                             'will be used for the test.')
+    parser.add_argument('--metrics', default=False, action='store_true', help='If the value is True, then the average '
+                                                                              'metrics on the validation dataset will '
+                                                                              'be calculated.')
+    parser.add_argument('--time', default=False, action='store_true', help='If the value is True, then the inference '
+                                                                           'time and the average fps on the validation '
+                                                                           'dataset will be calculated.')
+    parser.add_argument('--gpu', default=False, action='store_true', help='If True, then the gpu is used for the test.')
+    return parser.parse_args()
+
+
 def preparing_frame(image: np.ndarray, model) -> Tuple[np.ndarray, tuple, int]:
     """
     This function prepares the image and makes a prediction.
@@ -48,7 +66,7 @@ def visualization() -> None:
     TEXT_COLOR = (255, 255, 255)  # White
 
     model = build_model()
-    model.load_weights('models_data/save_models/resnet18_imagenet_2021-05-23 18:51:27/resnet18.h5')
+    model.load_weights(args.weights)
 
     cap = cv2.VideoCapture(0)
     while True:
@@ -89,7 +107,7 @@ def test_metrics_and_time(mode: str) -> None:
     """
     data_gen = DataGenerator(batch_size=1, is_train=False)
     model = build_model()
-    model.load_weights('models_data/save_models/resnet18_imagenet_2021-05-23 18:51:27/resnet18.h5')
+    model.load_weights(args.weights)
     model.compile(loss=tf.keras.losses.binary_crossentropy, metrics=[Accuracy(), IoURectangle()])
 
     if mode == 'metrics':
@@ -112,8 +130,16 @@ def test_metrics_and_time(mode: str) -> None:
 
 
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = ''
-    # devices = tf.config.experimental.list_physical_devices('GPU')
-    # tf.config.experimental.set_memory_growth(devices[0], True)
-    # visualization()
-    test_metrics_and_time('time')
+    args = parse_args()
+
+    if args.gpu is True:
+        os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+        devices = tf.config.experimental.list_physical_devices('GPU')
+        tf.config.experimental.set_memory_growth(devices[0], True)
+
+    if args.webcam is True:
+        visualization()
+    if args.metrics is True:
+        test_metrics_and_time('metrics')
+    if args.time is True:
+        test_metrics_and_time('time')
