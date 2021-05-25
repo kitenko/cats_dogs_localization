@@ -118,8 +118,11 @@ class F1Score(Metric):
 
 
 class IoURectangle(tf.keras.metrics.Metric):
-    def __init__(self, name: str = 'iou', **kwargs) -> None:
+    def __init__(self, name: str = 'iou_rectangle', **kwargs) -> None:
         """
+        This class is first initialized in variables with zeros, then calculates the batch metric 'iou_rectangle' and
+        adds the thread to the total value using 'assign_add'. After the number of resulting metrics is divided by the
+        number of batch, then at the end of the epoch, the results are reset to zero.
 
         :param name: this name metric.
         """
@@ -163,6 +166,8 @@ class IoURectangle(tf.keras.metrics.Metric):
 class Accuracy(tf.keras.metrics.BinaryAccuracy):
     def __init__(self, name='accuracy_custom', **kwargs):
         """
+        This class inherits from tf. keras.metrics. Binary accuracy, the "accuracy" metric is calculated only for the
+        cat or dog class.
 
         :param name: this name metric.
         """
