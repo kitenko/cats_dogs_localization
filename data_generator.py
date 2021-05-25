@@ -12,7 +12,7 @@ from config import NUMBER_OF_CLASSES, BATCH_SIZE, INPUT_SHAPE, USE_AUGMENTATION,
 
 
 class DataGenerator(keras.utils.Sequence):
-    def __init__(self, batch_size: int = BATCH_SIZE, is_train: bool = False,
+    def __init__(self, batch_size: int = BATCH_SIZE, is_train: bool = True,
                  image_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: int = NUMBER_OF_CLASSES,
                  augmentation_data: bool = USE_AUGMENTATION, train_data: str = TRAIN_DATA,
                  val_data: str = VAL_DATA) -> None:
@@ -160,8 +160,7 @@ def images_augmentation(use_augmentation: bool = USE_AUGMENTATION) -> A.Compose:
               A.CLAHE(clip_limit=(1.0, 3.0), tile_grid_size=(8, 8), p=0.2),
               A.ColorJitter(brightness=0.1, contrast=0.0, saturation=0.1, hue=0.0, p=0.2),
               A.Equalize(mode='cv', by_channels=True, mask=None, p=0.1),
-              A.Flip(p=0.4),
-              A.Rotate(limit=320, interpolation=1, border_mode=4, value=None, mask_value=None, always_apply=False,
+              A.Rotate(limit=50, interpolation=1, border_mode=4, value=None, mask_value=None, always_apply=False,
                        p=0.2)
               ], bbox_params=A.BboxParams(format='pascal_voc', label_fields=['category_ids']))
     else:
