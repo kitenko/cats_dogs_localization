@@ -39,7 +39,7 @@ def preparing_frame(image: np.ndarray, model) -> Tuple[np.ndarray, tuple, int]:
 
     :param image: this is input image or frame.
     :param model: model with loaded weights.
-    :return:
+    :return: frame, bounding_box and class for image.
     """
     image = cv2.resize(image, (INPUT_SHAPE[1], INPUT_SHAPE[0]))
     predict = model.predict(np.expand_dims(image, axis=0) / 255.0)[0]
