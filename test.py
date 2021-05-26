@@ -124,8 +124,7 @@ def test_metrics_and_time(mode: str) -> None:
         all_times = all_times[5:]
         message = '\nMean inference time: {:.04f}. Mean FPS: {:.04f}.\n'.format(
             np.mean(all_times),
-            len(all_times) / sum(all_times)
-        )
+            len(all_times) / sum(all_times))
         print(message)
 
 
