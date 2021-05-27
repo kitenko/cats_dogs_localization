@@ -67,25 +67,23 @@ def visualization() -> None:
     TEXT_COLOR = (255, 255, 255)  # White
 
     model = build_model()
-    model.load_weights(args.weights)
+    model.load_weights('models_data/save_models/resnet18_imagenet_2021-05-23_23_36_27/resnet18.h5')
 
     cap = cv2.VideoCapture(0)
     while True:
         ret, frame = cap.read()
 
-        predict = preparing_frame(image=frame, model=model)
+        frame, bounding_box, label = preparing_frame(image=frame, model=model)
 
-        x_min, y_min, x_max, y_max = (int(predict[1][0]),
-                                      int(predict[1][1]),
-                                      int(predict[1][2]),
-                                      int(predict[1][3]))
+        x_min, y_min, x_max, y_max = (int(bounding_box[0]), int(bounding_box[1]), int(bounding_box[2]),
+                                      int(bounding_box[3]))
         cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), color=BOX_COLOR, thickness=2)
-        ((text_width, text_height), _) = cv2.getTextSize(cat_dog[predict[2]],
+        ((text_width, text_height), _) = cv2.getTextSize(cat_dog[label],
                                                          cv2.FONT_HERSHEY_SIMPLEX, 0.35, 1)
         cv2.rectangle(frame, (x_min, y_min - int(1.3 * text_height)), (x_min + text_width, y_min), BOX_COLOR, -1)
         cv2.putText(
             frame,
-            text=cat_dog[predict[2]],
+            text=cat_dog[label],
             org=(x_min, y_min - int(0.3 * text_height)),
             fontFace=cv2.FONT_HERSHEY_SIMPLEX,
             fontScale=0.35,
