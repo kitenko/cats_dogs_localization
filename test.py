@@ -33,7 +33,8 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def preparing_frame(image: np.ndarray, model) -> Tuple[np.ndarray, tuple, int]:
+def preparing_frame(image: np.ndarray, model: tf.keras.Model) -> Tuple[np.ndarray, Tuple[float, float, float, float],
+                                                                       int]:
     """
     This function prepares the image and makes a prediction.
 
@@ -107,11 +108,13 @@ def test_metrics_and_time(mode: str) -> None:
     """
     data_gen = DataGenerator(batch_size=1, is_train=False)
     model = build_model()
-    model.load_weights(args.weights)
+    model.load_weights('models_data/save_models/resnet18_imagenet_2021-05-23_18_51_27/resnet18.h5')
     model.compile(loss=tf.keras.losses.binary_crossentropy, metrics=[Accuracy(), IoURectangle()])
 
     if mode == 'metrics':
-        print(model.evaluate(data_gen, workers=8))
+        metrics = model.evaluate(data_gen, workers=8)
+        print('Loss:{:.2f}'.format(metrics[0]), 'Accuracy:{:.2f}%'.format(metrics[1]),
+              'IoURectangle:{:.2f}%'.format(metrics[2]))
 
     elif mode == 'time':
         all_times = []
@@ -138,7 +141,7 @@ if __name__ == '__main__':
 
     if args.webcam is True:
         visualization()
-    if args.metrics is True:
-        test_metrics_and_time('metrics')
+    # if args.metrics is True:
+    test_metrics_and_time('metrics')
     if args.time is True:
         test_metrics_and_time('time')
