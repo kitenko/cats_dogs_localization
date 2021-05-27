@@ -4,11 +4,10 @@ from datetime import datetime
 DATASET_PATH = 'cats_dogs_dataset'
 TRAIN_DATA = os.path.join(DATASET_PATH, 'train')
 VAL_DATA = os.path.join(DATASET_PATH, 'valid')
-JSON_FILE_PATH = os.path.join(DATASET_PATH, 'data.json')
 
 BATCH_SIZE = 8
 NUMBER_OF_CLASSES = 2
-INPUT_SHAPE = (224, 224, 3)
+INPUT_SHAPE = (256, 256, 3)
 LEARNING_RATE = 0.0001
 EPOCHS = 150
 WEIGHTS = 'imagenet'
