@@ -21,15 +21,13 @@ def parse_args() -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser('script for model testing.')
     parser.add_argument('--weights', type=str, default=None, help='Path for loading model weights.')
-    parser.add_argument('--webcam', default=False, action='store_true', help='If the value is True, then the webcam '
-                                                                             'will be used for the test.')
-    parser.add_argument('--metrics', default=False, action='store_true', help='If the value is True, then the average '
-                                                                              'metrics on the validation dataset will '
-                                                                              'be calculated.')
-    parser.add_argument('--time', default=False, action='store_true', help='If the value is True, then the inference '
-                                                                           'time and the average fps on the validation '
-                                                                           'dataset will be calculated.')
-    parser.add_argument('--gpu', default=False, action='store_true', help='If True, then the gpu is used for the test.')
+    parser.add_argument('--webcam', action='store_true', help='If the value is True, then the webcam will be used for '
+                                                              'the test.')
+    parser.add_argument('--metrics', action='store_true', help='If the value is True, then the average metrics on the '
+                                                               'validation dataset will be calculated.')
+    parser.add_argument('--time', action='store_true', help='If the value is True, then the inference time and the '
+                                                            'average fps on the validation dataset will be calculated.')
+    parser.add_argument('--gpu', action='store_true', help='If True, then the gpu is used for the test.')
     return parser.parse_args()
 
 
