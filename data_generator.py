@@ -1,12 +1,12 @@
-from pathlib import Path
 import os
 from typing import Tuple
+from pathlib import Path
 
 import cv2
-from tensorflow import keras
 import numpy as np
 import albumentations as A
 import matplotlib.pyplot as plt
+from tensorflow import keras
 
 from config import NUMBER_OF_CLASSES, BATCH_SIZE, INPUT_SHAPE, USE_AUGMENTATION, TRAIN_DATA, VAL_DATA
 
@@ -91,9 +91,9 @@ class DataGenerator(keras.utils.Sequence):
             bounding_box = aug['bboxes'][0]
             labels[i, 0] = int(aug['category_ids'][0])
             labels[i, 1] = float(bounding_box[0]/self.image_shape[0])
-            labels[i, 2] = float(bounding_box[1]/self.image_shape[0])
+            labels[i, 2] = float(bounding_box[1]/self.image_shape[1])
             labels[i, 3] = float(bounding_box[2]/self.image_shape[0])
-            labels[i, 4] = float(bounding_box[3]/self.image_shape[0])
+            labels[i, 4] = float(bounding_box[3]/self.image_shape[1])
         images = image_normalization(images)
         return images, labels
 
