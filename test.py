@@ -108,7 +108,7 @@ def test_metrics_and_time(mode: str) -> None:
     """
     data_gen = DataGenerator(batch_size=1, is_train=False)
     model = build_model()
-    model.load_weights('models_data/save_models/resnet18_imagenet_2021-05-23_18_51_27/resnet18.h5')
+    model.load_weights(args.weights)
     model.compile(loss=tf.keras.losses.binary_crossentropy, metrics=[Accuracy(), IoURectangle()])
 
     if mode == 'metrics':
@@ -141,7 +141,7 @@ if __name__ == '__main__':
 
     if args.webcam is True:
         visualization()
-    # if args.metrics is True:
-    test_metrics_and_time('metrics')
+    if args.metrics is True:
+        test_metrics_and_time('metrics')
     if args.time is True:
         test_metrics_and_time('time')
