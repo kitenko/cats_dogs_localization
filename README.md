@@ -1,4 +1,4 @@
-# cats_dogs_detection
+# cats_dogs_localization
 
 Scripts for training and testing convolutional neural network for localization of the object.
 
