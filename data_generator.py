@@ -62,10 +62,6 @@ class DataGenerator(keras.utils.Sequence):
         np.random.shuffle(self.data)
 
     def __len__(self) -> int:
-        for i in self.data:
-            count_image = 0
-            if i.endswith('.jpg'):
-                count_image += 1
         return len(self.data) // self.batch_size + (len(self.data) % self.batch_size != 0)
 
     def __getitem__(self, batch_idx: int) -> Tuple[np.ndarray, np.ndarray]:
