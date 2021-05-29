@@ -44,7 +44,6 @@ def train() -> None:
 
 
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     devices = tf.config.experimental.list_physical_devices('GPU')
     tf.config.experimental.set_memory_growth(devices[0], True)
     train()
