@@ -68,6 +68,7 @@ def visualization() -> None:
     model.load_weights('models_data/save_models/resnet18_imagenet_2021-05-23_23_36_27/resnet18.h5')
 
     cap = cv2.VideoCapture(0)
+    prev_frame_time = 0
     while True:
         ret, frame = cap.read()
 
@@ -88,7 +89,10 @@ def visualization() -> None:
             color=TEXT_COLOR,
             lineType=cv2.LINE_AA,
         )
-
+        new_frame_time = time.time()
+        fps = 1 / (new_frame_time - prev_frame_time)
+        prev_frame_time = new_frame_time
+        cv2.putText(frame, str(int(fps)) + ':fps', (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
         cv2.imshow('frame', frame)
         if cv2.waitKey(1) == ord('q'):
             break
@@ -131,7 +135,6 @@ if __name__ == '__main__':
     args = parse_args()
 
     if args.gpu is True:
-        os.environ['CUDA_VISIBLE_DEVICES'] = '0'
         devices = tf.config.experimental.list_physical_devices('GPU')
         tf.config.experimental.set_memory_growth(devices[0], True)
 
