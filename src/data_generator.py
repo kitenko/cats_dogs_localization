@@ -8,14 +8,13 @@ import albumentations as A
 import matplotlib.pyplot as plt
 from tensorflow import keras
 
-from config import NUMBER_OF_CLASSES, BATCH_SIZE, INPUT_SHAPE, USE_AUGMENTATION, TRAIN_DATA, VAL_DATA
+from config import NUMBER_OF_CLASSES, BATCH_SIZE, INPUT_SHAPE, AUGMENTATION_DATA
 
 
 class DataGenerator(keras.utils.Sequence):
-    def __init__(self, batch_size: int = BATCH_SIZE, is_train: bool = True,
+    def __init__(self, train_data: str, val_data: str, batch_size: int = BATCH_SIZE, is_train: bool = True,
                  image_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: int = NUMBER_OF_CLASSES,
-                 augmentation_data: bool = USE_AUGMENTATION, train_data: str = TRAIN_DATA,
-                 val_data: str = VAL_DATA) -> None:
+                 augmentation_data: bool = AUGMENTATION_DATA) -> None:
         """
         Data generator for the task of colour images classifying.
 
@@ -142,7 +141,7 @@ class DataGenerator(keras.utils.Sequence):
             plt.close()
 
 
-def images_augmentation(use_augmentation: bool = USE_AUGMENTATION) -> A.Compose:
+def images_augmentation(use_augmentation: bool = AUGMENTATION_DATA) -> A.Compose:
     """
     This function makes augmentation data.
 

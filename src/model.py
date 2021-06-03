@@ -7,13 +7,13 @@ from classification_models.tfkeras import Classifiers
 from config import MODEL_NAME, INPUT_SHAPE, NUMBER_OF_CLASSES, WEIGHTS
 
 
-def build_model(input_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: int = NUMBER_OF_CLASSES,
+def build_model(image_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: int = NUMBER_OF_CLASSES,
                 name_model: str = MODEL_NAME, weights: str = WEIGHTS) -> tf.keras.models.Model:
     """
     This function creates a model from 'classification_models.tf.keras' or 'efficientnet.tf.keras' library depending on
     the input parameters.
 
-    :param input_shape: input shape (height, width, channels).
+    :param image_shape: input shape (height, width, channels).
     :param num_classes: number of classes.
     :param name_model: the name of the model to be built.
     :param weights: ImageNet or None.
@@ -34,9 +34,9 @@ def build_model(input_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: in
     try:
         if MODEL_NAME[:-2].lower() != 'efficientnet':
             name_model, preprocess_input = Classifiers.get(name_model)
-            base_model = name_model(input_shape=input_shape, weights=weights, include_top=False)
+            base_model = name_model(input_shape=image_shape, weights=weights, include_top=False)
         else:
-            base_model = models_dict[name_model](input_shape=input_shape, weights=weights, include_top=False)
+            base_model = models_dict[name_model](input_shape=image_shape, weights=weights, include_top=False)
     except ValueError:
         print('the model name is incorrect, please check the model name')
 

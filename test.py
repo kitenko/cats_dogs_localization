@@ -1,18 +1,16 @@
-import os
 import time
 import argparse
-from typing import Tuple
 from tqdm import tqdm
+from typing import Tuple, List
 
 import cv2
 import numpy as np
 import tensorflow as tf
-import albumentations as A
 
-from model import build_model
-from data_generator import DataGenerator
+from src import build_model
+from src import DataGenerator
 from config import INPUT_SHAPE
-from metrics import Accuracy, IoURectangle
+from src import Accuracy, IoURectangle
 
 
 def parse_args() -> argparse.Namespace:
@@ -31,14 +29,16 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def preparing_frame(image: np.ndarray, model: tf.keras.Model) -> Tuple[np.ndarray, Tuple[float, float, float, float],
-                                                                       int]:
+def preparing_frame(image: np.ndarray, model: tf.keras.Model, cam_width: float, cam_height: float) -> Tuple[List[int],
+                                                                                                            int]:
     """
     This function prepares the image and makes a prediction.
 
+    :param cam_height:
+    :param cam_width:
     :param image: this is input image or frame.
     :param model: model with loaded weights.
-    :return: frame, bounding_box and class for image.
+    :return: bounding_box and class for image.
     """
     image = cv2.resize(image, (INPUT_SHAPE[1], INPUT_SHAPE[0]))
     predict = model.predict(np.expand_dims(image, axis=0) / 255.0)[0]
@@ -47,13 +47,10 @@ def preparing_frame(image: np.ndarray, model: tf.keras.Model) -> Tuple[np.ndarra
     else:
         label = 1
 
-    aug = A.Compose([A.Resize(height=720, width=720)],
-                    bbox_params=A.BboxParams(format='pascal_voc', label_fields=['category_ids']))
-    transform = aug(image=image, bboxes=[predict[1:] * INPUT_SHAPE[0]], category_ids=[str(predict[0])])
-    frame = transform['image']
-    bounding_box = transform['bboxes'][0]
+    bounding_box = [int(predict[1]*cam_width), int(predict[2]*cam_height),  int(predict[3]*cam_width),
+                    int(predict[4]*cam_height)]
 
-    return frame, bounding_box, label
+    return bounding_box, label
 
 
 def visualization() -> None:
@@ -68,14 +65,16 @@ def visualization() -> None:
     model.load_weights('models_data/save_models/resnet18_imagenet_2021-05-23_23_36_27/resnet18.h5')
 
     cap = cv2.VideoCapture(0)
+    width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+    height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+
     prev_frame_time = 0
     while True:
         ret, frame = cap.read()
 
-        frame, bounding_box, label = preparing_frame(image=frame, model=model)
+        bounding_box, label = preparing_frame(image=frame, model=model, cam_width=width, cam_height=height)
 
-        x_min, y_min, x_max, y_max = (int(bounding_box[0]), int(bounding_box[1]), int(bounding_box[2]),
-                                      int(bounding_box[3]))
+        x_min, y_min, x_max, y_max = bounding_box
         cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), color=BOX_COLOR, thickness=2)
         ((text_width, text_height), _) = cv2.getTextSize(cat_dog[label],
                                                          cv2.FONT_HERSHEY_SIMPLEX, 0.35, 1)

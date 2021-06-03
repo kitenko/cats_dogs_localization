@@ -4,12 +4,12 @@ from typing import Dict
 
 from tensorflow import keras
 
-from config import LOGS_DIR_CURRENT_MODEL, SAVE_CURRENT_MODEL, SAVE_MODEL_EVERY_EPOCH
+from config import SAVE_MODEL_EVERY_EPOCH
 
 
 class LogCallback(keras.callbacks.Callback):
-    def __init__(self, model_save_path: str = SAVE_CURRENT_MODEL, logs_save_path: str = LOGS_DIR_CURRENT_MODEL,
-                 save_model_every_era: bool = SAVE_MODEL_EVERY_EPOCH) -> None:
+    def __init__(self, model_save_path: str, logs_save_path: str, save_model_every_era: bool =
+                 SAVE_MODEL_EVERY_EPOCH) -> None:
         """
         Logging all training metrics to a json file and saving the model every epoch.
 
