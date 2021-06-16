@@ -62,7 +62,7 @@ def visualization() -> None:
     TEXT_COLOR = (255, 255, 255)  # White
 
     model = build_model()
-    model.load_weights('models_data/save_models/resnet18_imagenet_2021-05-23_23_36_27/resnet18.h5')
+    model.load_weights(args.weights)
 
     cap = cv2.VideoCapture(0)
     width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
