@@ -1,6 +1,5 @@
 import os
 from typing import Tuple
-from pathlib import Path
 
 import cv2
 import numpy as np
@@ -33,24 +32,16 @@ class DataGenerator(keras.utils.Sequence):
         self.val_data = val_data
 
         if is_train:
-            image = []
-            data = os.listdir(train_data)
-            for i in data:
-                if i.endswith('.jpg'):
-                    image.append(i)
+            images = [i for i in os.listdir(train_data) if i.endswith('.jpg')]
             augmentation = images_augmentation(use_augmentation=self.augmentation_data)
             self.path_data = train_data
         else:
-            image = []
-            data = os.listdir(val_data)
-            for i in data:
-                if i.endswith('.jpg'):
-                    image.append(i)
+            images = [i for i in os.listdir(train_data) if i.endswith('.jpg')]
             augmentation = images_augmentation(use_augmentation=False)
             self.path_data = val_data
 
         self.aug = augmentation
-        self.data = image
+        self.data = images
         self.on_epoch_end()
 
     def on_epoch_end(self) -> None:
@@ -74,7 +65,7 @@ class DataGenerator(keras.utils.Sequence):
         images = np.zeros((self.batch_size, self.image_shape[0], self.image_shape[1], self.image_shape[2]))
         labels = np.zeros((self.batch_size, 5))
         for i, img in enumerate(batch):
-            name_txt_file = Path(img).stem + ".txt"
+            name_txt_file = os.path.splitext(img)[0] + '.txt'
             img = cv2.imread(os.path.join(self.path_data, img))
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             with open(os.path.join(self.path_data, name_txt_file)) as f:
@@ -175,5 +166,5 @@ def image_normalization(image: np.ndarray) -> np.ndarray:
 
 
 if __name__ == '__main__':
-    x = DataGenerator()
+    x = DataGenerator(train_data='cats_dogs_dataset/train', val_data='cats_dogs_dataset/valid')
     x.show()
