@@ -6,16 +6,16 @@ from typing import Tuple
 import tensorflow as tf
 from tensorflow.keras.callbacks import EarlyStopping
 
-from src import DataGenerator
-from src import build_model
-from src import LogCallback
+from src import DataGenerator, build_model, LogCallback, IoURectangle, Accuracy
 from config import MODEL_NAME, INPUT_SHAPE, LOGS, SAVE_MODELS, LEARNING_RATE, EPOCHS
-from src import IoURectangle, Accuracy
 
 
 def train(data_path: str, input_shape_image: Tuple[int, int, int] = INPUT_SHAPE) -> None:
     """
     Training to classify generated images.
+
+    param data_path: path to Dataset.
+    param input_shape_image: input shape images.
     """
     date_time_for_save = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     save_path = os.path.join(args.models_data, '{}_{}_shape-{}'.format(MODEL_NAME, date_time_for_save,
@@ -74,13 +74,18 @@ def parse_args() -> argparse.Namespace:
 
 if __name__ == '__main__':
     args = parse_args()
-    os.environ['CUDA_VISIBLE_DEVICES'] = ''
+    # os.environ['CUDA_VISIBLE_DEVICES'] = 0
+    # DEVICES_TO_USE = [args.gpu]
+    # devices = tf.config.experimental.list_physical_devices('GPU')
+    # devices = [devices[i] for i in DEVICES_TO_USE]
+    # # tf.config.set_visible_devices(devices)
+    # for device in devices:
+    #     tf.config.experimental.set_memory_growth(device, True)
+
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     DEVICES_TO_USE = [args.gpu]
     devices = tf.config.experimental.list_physical_devices('GPU')
     devices = [devices[i] for i in DEVICES_TO_USE]
-    # tf.config.set_visible_devices(devices)
-    for device in devices:
-        tf.config.experimental.set_memory_growth(device, True)
 
     if args.train is True:
         train(data_path=args.data_path, input_shape_image=INPUT_SHAPE)
