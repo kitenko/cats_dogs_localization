@@ -38,7 +38,7 @@ def build_model(image_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: in
         else:
             base_model = models_dict[name_model](input_shape=image_shape, weights=weights, include_top=False)
     except ValueError:
-        print('the model name is incorrect, please check the model name')
+        raise ValueError('Model name or backbone name or weights name is incorrect')
 
     x = tf.keras.layers.GlobalAveragePooling2D()(base_model.output)
     output = tf.keras.layers.Dense(5, activation='sigmoid')(x)
