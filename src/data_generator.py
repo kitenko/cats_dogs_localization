@@ -87,37 +87,35 @@ class DataGenerator(keras.utils.Sequence):
         """
         This method showing image with label.
         """
-        BOX_COLOR = (255, 0, 0)  # Red
-        TEXT_COLOR = (255, 255, 255)  # White
+        box_color = (255, 0, 0)
+        text_color = (255, 255, 255)
 
         for i in range(len(self)):
-            batch = self[i]
-            images, labels = batch[0], batch[1]
 
+            images, labels = self[i]
             cat_dog = {0: 'cat', 1: 'dog'}
-
             rows_columns_subplot = self.batch_size
+
             while np.math.sqrt(rows_columns_subplot) - int(np.math.sqrt(rows_columns_subplot)) != 0.0:
                 rows_columns_subplot += 1
             rows_columns_subplot = int(np.math.sqrt(rows_columns_subplot))
-
             plt.figure(figsize=[20, 20])
             for i, j in enumerate(images):
                 x_min, y_min, x_max, y_max = (int(self.image_shape[0] * labels[i, 1]),
                                               int(self.image_shape[0] * labels[i, 2]),
                                               int(self.image_shape[0] * labels[i, 3]),
                                               int(self.image_shape[0] * labels[i, 4]))
-                cv2.rectangle(j, (x_min, y_min), (x_max, y_max), color=BOX_COLOR, thickness=2)
+                cv2.rectangle(j, (x_min, y_min), (x_max, y_max), color=box_color, thickness=2)
                 ((text_width, text_height), _) = cv2.getTextSize(cat_dog[int(labels[i][0])],
                                                                  cv2.FONT_HERSHEY_SIMPLEX, 0.35, 1)
-                cv2.rectangle(j, (x_min, y_min - int(1.3 * text_height)), (x_min + text_width, y_min), BOX_COLOR, -1)
+                cv2.rectangle(j, (x_min, y_min - int(1.3 * text_height)), (x_min + text_width, y_min), box_color, -1)
                 cv2.putText(
                     j,
                     text=cat_dog[labels[i][0]],
                     org=(x_min, y_min - int(0.3 * text_height)),
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.35,
-                    color=TEXT_COLOR,
+                    color=text_color,
                     lineType=cv2.LINE_AA,
                 )
                 plt.subplot(rows_columns_subplot, rows_columns_subplot, i+1)
@@ -166,5 +164,6 @@ def image_normalization(image: np.ndarray) -> np.ndarray:
 
 
 if __name__ == '__main__':
-    x = DataGenerator(train_data='cats_dogs_dataset/train', val_data='cats_dogs_dataset/valid')
+    x = DataGenerator(train_data=os.path.join('cats_dogs_dataset', 'train'),
+                      val_data=os.path.join('cats_dogs_dataset', 'valid'))
     x.show()
