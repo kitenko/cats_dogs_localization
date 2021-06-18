@@ -39,10 +39,16 @@ class IoURectangle(tf.keras.metrics.Metric):
         self.ious.assign_add(tf.reduce_sum(iou))
         self.batches.assign_add(tf.cast(tf.shape(iou)[0], tf.float32))
 
-    def result(self):
+    def result(self) -> float:
+        """
+        Calculating the average value of the iou metric.
+        """
         return self.ious / self.batches
 
     def reset_state(self):
+        """
+        This function resets the butch and the metric.
+        """
         self.ious.assign(0)
         self.batches.assign(0)
 
