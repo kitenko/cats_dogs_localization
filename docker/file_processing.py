@@ -174,7 +174,7 @@ def parse_args() -> argparse.Namespace:
     Parsing command line arguments with argparse.
     """
     parser = argparse.ArgumentParser('script for model testing.')
-    parser.add_argument('--model_onnx', type=str, default='onnx_model', help='Path for loading model weights.')
+    parser.add_argument('--model_onnx', type=str, default='onnx_model.onnx', help='Path for loading model weights.')
     parser.add_argument('--input_shape', type=Tuple, default=(256, 256, 3), help='inpute shape model')
     parser.add_argument('--input', type=str, default=None, help='input')
     return parser.parse_args()
