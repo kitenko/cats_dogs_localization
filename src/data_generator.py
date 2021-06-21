@@ -4,29 +4,25 @@ from typing import Tuple
 import cv2
 import numpy as np
 import albumentations as A
-import matplotlib.pyplot as plt
 from tensorflow import keras
 
-from config import NUMBER_OF_CLASSES, BATCH_SIZE, INPUT_SHAPE, AUGMENTATION_DATA
+from config import BATCH_SIZE, INPUT_SHAPE, AUGMENTATION_DATA
 
 
 class DataGenerator(keras.utils.Sequence):
     def __init__(self, train_data: str, val_data: str, batch_size: int = BATCH_SIZE, is_train: bool = True,
-                 image_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: int = NUMBER_OF_CLASSES,
-                 augmentation_data: bool = AUGMENTATION_DATA) -> None:
+                 image_shape: Tuple[int, int, int] = INPUT_SHAPE, augmentation_data: bool = AUGMENTATION_DATA) -> None:
         """
         Data generator for the task of colour images classifying.
 
         :param batch_size: number of images in one batch.
         :param is_train: if is_train = True, then we work with train images, otherwise with test.
         :param image_shape: this is image shape (height, width, channels).
-        :param num_classes: number of image classes.
         :param augmentation_data: if this parameter is True, then augmentation is applied to the training dataset.
         """
         self.batch_size = batch_size
         self.is_train = is_train
         self.image_shape = image_shape
-        self.num_classes = num_classes
         self.augmentation_data = augmentation_data
         self.train_data = train_data
         self.val_data = val_data
@@ -36,7 +32,7 @@ class DataGenerator(keras.utils.Sequence):
             augmentation = images_augmentation(use_augmentation=self.augmentation_data)
             self.path_data = train_data
         else:
-            images = [i for i in os.listdir(train_data) if i.endswith('.jpg')]
+            images = [i for i in os.listdir(val_data) if i.endswith('.jpg')]
             augmentation = images_augmentation(use_augmentation=False)
             self.path_data = val_data
 
@@ -66,6 +62,8 @@ class DataGenerator(keras.utils.Sequence):
         labels = np.zeros((self.batch_size, 5))
         for i, img in enumerate(batch):
             name_txt_file = os.path.splitext(img)[0] + '.txt'
+            if cv2.imread(os.path.join(self.path_data, img)) is None:
+                continue
             img = cv2.imread(os.path.join(self.path_data, img))
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             with open(os.path.join(self.path_data, name_txt_file)) as f:
@@ -82,52 +80,6 @@ class DataGenerator(keras.utils.Sequence):
             labels[i, 4] = float(bounding_box[3]/self.image_shape[1])
         images = image_normalization(images)
         return images, labels
-
-    def show(self) -> None:
-        """
-        This method showing image with label.
-        """
-        box_color = (255, 0, 0)
-        text_color = (255, 255, 255)
-
-        for i in range(len(self)):
-
-            images, labels = self[i]
-            cat_dog = {0: 'cat', 1: 'dog'}
-            rows_columns_subplot = self.batch_size
-
-            while np.math.sqrt(rows_columns_subplot) - int(np.math.sqrt(rows_columns_subplot)) != 0.0:
-                rows_columns_subplot += 1
-            rows_columns_subplot = int(np.math.sqrt(rows_columns_subplot))
-            plt.figure(figsize=[20, 20])
-            for i, j in enumerate(images):
-                x_min, y_min, x_max, y_max = (int(self.image_shape[0] * labels[i, 1]),
-                                              int(self.image_shape[0] * labels[i, 2]),
-                                              int(self.image_shape[0] * labels[i, 3]),
-                                              int(self.image_shape[0] * labels[i, 4]))
-                cv2.rectangle(j, (x_min, y_min), (x_max, y_max), color=box_color, thickness=2)
-                ((text_width, text_height), _) = cv2.getTextSize(cat_dog[int(labels[i][0])],
-                                                                 cv2.FONT_HERSHEY_SIMPLEX, 0.35, 1)
-                cv2.rectangle(j, (x_min, y_min - int(1.3 * text_height)), (x_min + text_width, y_min), box_color, -1)
-                cv2.putText(
-                    j,
-                    text=cat_dog[labels[i][0]],
-                    org=(x_min, y_min - int(0.3 * text_height)),
-                    fontFace=cv2.FONT_HERSHEY_SIMPLEX,
-                    fontScale=0.35,
-                    color=text_color,
-                    lineType=cv2.LINE_AA,
-                )
-                plt.subplot(rows_columns_subplot, rows_columns_subplot, i+1)
-                plt.imshow(j)
-                if self.train_data is True:
-                    plt.title('Augmented, class = "{}"'.format(cat_dog[labels[i][0]]))
-                else:
-                    plt.title('Original, class = "{}"'.format(cat_dog[labels[i][0]]))
-            if plt.waitforbuttonpress(0):
-                plt.close('all')
-                raise SystemExit
-            plt.close()
 
 
 def images_augmentation(use_augmentation: bool = AUGMENTATION_DATA) -> A.Compose:
@@ -161,9 +113,3 @@ def image_normalization(image: np.ndarray) -> np.ndarray:
     :return: normalized image.
     """
     return image / 255.0
-
-
-if __name__ == '__main__':
-    x = DataGenerator(train_data=os.path.join('cats_dogs_dataset', 'train'),
-                      val_data=os.path.join('cats_dogs_dataset', 'valid'))
-    x.show()
