@@ -1,9 +1,6 @@
 FROM python:3.8.5
 LABEL maintainer="Andre"
 
-WORKDIR /detection
-COPY file_processing.py onnx_model.onnx requirements.txt ./
-
 RUN apt-get update \
     && apt-get install -y \
         build-essential \
@@ -23,4 +20,8 @@ RUN apt-get update \
         libpq-dev \
         nano \
     && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /detection
+COPY file_processing.py onnx_model.onnx requirements.txt ./
+
 RUN pip install --upgrade pip && pip install -r requirements.txt --no-cache-dir
