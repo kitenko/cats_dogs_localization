@@ -4,17 +4,16 @@ import tensorflow as tf
 import efficientnet.tfkeras as efn
 from classification_models.tfkeras import Classifiers
 
-from config import MODEL_NAME, INPUT_SHAPE, NUMBER_OF_CLASSES, WEIGHTS
+from config import MODEL_NAME, INPUT_SHAPE, WEIGHTS
 
 
-def build_model(image_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: int = NUMBER_OF_CLASSES,
-                name_model: str = MODEL_NAME, weights: str = WEIGHTS) -> tf.keras.models.Model:
+def build_model(image_shape: Tuple[int, int, int] = INPUT_SHAPE, name_model: str = MODEL_NAME,
+                weights: str = WEIGHTS) -> tf.keras.models.Model:
     """
     This function creates a model from 'classification_models.tf.keras' or 'efficientnet.tf.keras' library depending on
     the input parameters.
 
     :param image_shape: input shape (height, width, channels).
-    :param num_classes: number of classes.
     :param name_model: the name of the model to be built.
     :param weights: ImageNet or None.
     :return: tf.keras.models.Model
