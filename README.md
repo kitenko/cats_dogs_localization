@@ -29,7 +29,11 @@ cats_dogs_dataset/
 ## 1. Training
 Run training script with default parameters:
 ```shell script
-python train.py
+python train.py --train
+```
+If you want to make a training with a different input resolution, then you can use 
+```shell script
+python train.py --train_dif_shape
 ```
 ## 2. Plotting graphs
 If you want to build graphs from saved logs, you can use tens or board by passing the path to the logs folder.
