@@ -27,11 +27,11 @@ def parse_args() -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser('script for model testing.')
     parser.add_argument('--weights', type=str, default=None, help='Path for loading model weights.')
-    parser.add_argument('--onnx_model', type=str, default=None, help='Path for save onnx model.')
+    parser.add_argument('--save_onnx', type=str, default=None, help='Path for save onnx model.')
     parser.add_argument('--name_model', type=str, default='onnx_model.onnx', help='Name model.')
     return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = parse_args()
-    convert(path_keras_weights=args.weights, path_save_onnx=args.onnx_model, onnx_model_name=args.name_model)
+    convert(path_keras_weights=args.weights, path_save_onnx=args.save_onnx, onnx_model_name=args.name_model)
