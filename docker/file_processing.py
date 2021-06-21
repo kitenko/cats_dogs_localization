@@ -1,14 +1,12 @@
 import os
-import sys
 import time
 import argparse
-from tqdm import tqdm
 from typing import Tuple, List, Dict
 
 import cv2
-import onnxruntime
 import numpy as np
 import onnxruntime as rt
+from tqdm import tqdm
 
 
 def input_args(input_argument: str, model_path: str) -> None:
@@ -68,7 +66,7 @@ def preparing_frame(image: np.ndarray, model: rt.InferenceSession, cam_width: fl
 
 def visualization(model_path: str, mode: str, path_file: str, path_folder: str) -> None:
     """
-    This function captures webcam video and resizes the image.
+    This function, depending on the input parameter 'mode', processes the input data differently.
     """
     cat_dog = {0: 'cat', 1: 'dog'}
     box_color = (255, 0, 0)
@@ -87,8 +85,8 @@ def visualization(model_path: str, mode: str, path_file: str, path_folder: str) 
             if img is None:
                 print('There are problems with the image file. \n Path: ' + os.path.join(path_folder, images[i]))
                 continue
-            width = img.shape[0]
-            height = img.shape[1]
+            width = img.shape[1]
+            height = img.shape[0]
 
             bounding_box, label = preparing_frame(image=img, model=model, cam_width=width, cam_height=height)
 
@@ -108,7 +106,7 @@ def visualization(model_path: str, mode: str, path_file: str, path_folder: str) 
             )
             cv2.imwrite(os.path.join(path_save_image, images[i]), img)
 
-        sys.exit(0)
+        return
 
     elif mode == 'video processing':
         cap = cv2.VideoCapture(path_file)
@@ -145,10 +143,12 @@ def visualization(model_path: str, mode: str, path_file: str, path_folder: str) 
     out.release()
 
 
-def video_processing(cap: cv2.VideoCapture, model: onnxruntime.InferenceSession, width: int, height: int,
+def video_processing(cap: cv2.VideoCapture, model: rt.InferenceSession, width: int, height: int,
                      box_color: Tuple[int, int, int], cat_dog: Dict, text_color: Tuple[int, int, int],
-                     out: cv2.VideoWriter, fps: float):
-
+                     out: cv2.VideoWriter, fps: float) -> None:
+    """
+    This function reads the frame, makes a prediction, and draws a rectangle, recording each frame.
+    """
     ret, frame = cap.read()
     bounding_box, label = preparing_frame(image=frame, model=model, cam_width=width, cam_height=height)
     x_min, y_min, x_max, y_max = bounding_box
