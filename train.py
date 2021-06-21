@@ -68,29 +68,28 @@ def parse_args() -> argparse.Namespace:
                              'input shape from (256*256*3) before (512*512*3)')
     parser.add_argument('--data_path', type=str, default='cats_dogs_dataset', help='path to Dataset')
     parser.add_argument('--models_data', type=str, default='models_data', help='path for saving logs and models')
-    parser.add_argument('--gpu', type=str, default=0, help='which gpu to use in')
+    parser.add_argument('--gpu', type=str, default=0, help='If you want to use the GPU, you must specify the number '
+                                                           'of the video card that you want to use.')
     return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = parse_args()
-    # os.environ['CUDA_VISIBLE_DEVICES'] = 0
-    # DEVICES_TO_USE = [args.gpu]
-    # devices = tf.config.experimental.list_physical_devices('GPU')
-    # devices = [devices[i] for i in DEVICES_TO_USE]
-    # # tf.config.set_visible_devices(devices)
-    # for device in devices:
-    #     tf.config.experimental.set_memory_growth(device, True)
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    DEVICES_TO_USE = [args.gpu]
-    devices = tf.config.experimental.list_physical_devices('GPU')
-    devices = [devices[i] for i in DEVICES_TO_USE]
+    if args.gpu != '_':
+        gpus_list = [int(args.gpu)]
+    else:
+        gpus_list = []
+    devices = tf.config.get_visible_devices('GPU')
+    devices = [devices[i] for i in gpus_list]
+    tf.config.set_visible_devices(devices, 'GPU')
+    for gpu in devices:
+        tf.config.experimental.set_memory_growth(gpu, True)
 
-    if args.train is True:
+    if args.train:
         train(data_path=args.data_path, input_shape_image=INPUT_SHAPE)
 
-    if parse_args().train_dif_shape is True:
+    if parse_args().train_dif_shape:
         for i in range(5):
             input_shape = [(INPUT_SHAPE[0] + (64 * i), INPUT_SHAPE[1] +
                             (64 * i), 3) for i in range(0, 5, 1)]
