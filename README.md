@@ -26,7 +26,7 @@ cats_dogs_dataset/
                 ...
 ``` 
 
-## 1. Training
+## 2. Training
 Run training script with default parameters:
 ```shell script
 python train.py --train
@@ -35,12 +35,12 @@ If you want to make a training with a different input resolution, then you can u
 ```shell script
 python train.py --train_dif_shape
 ```
-## 2. Plotting graphs
+## 3. Plotting graphs
 If you want to build graphs from saved logs, you can use tens or board by passing the path to the logs folder.
 ```shell script
 tensorboard --logdir models_data/tensorboard_logs/resnet18_imagenet_2021-05-23_15-19-49
 ```
-## 3. Testing
+## 4. Testing
 If you want to use webcam for the test, you should pass two arguments --weights and --webcam. 
 ```shell script
 python test.py --weights models_data/resnet18_2021-06-21_16-17-12_shape-256-256/save_models/resnet18.h5 --webcam
@@ -59,7 +59,7 @@ need to specify this parameter.
 ```shell script
 python test.py --gpu 0 test.py --webcam --weights models_data/resnet18_2021-06-21_16-17-12_shape-256-256/save_models/resnet18.h5
 ```
-## 4. Docker 
+## 5. Docker 
 You can also use Docker. To build an image, you can go to the docker folder and run the following command
 ```shell script
 docker build -t name_image .
