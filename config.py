@@ -6,7 +6,7 @@ WEIGHTS = 'imagenet'
 AUGMENTATION_DATA = True
 SAVE_MODEL_EVERY_EPOCH = False
 
-MODEL_NAME = 'resnet18'
+MODEL_NAME = 'EfficientNetB0'
 
 LOGS = 'logs'
 SAVE_MODELS = 'save_models'
